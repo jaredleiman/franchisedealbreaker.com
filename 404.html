@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Page Not Found — FranchiseDealBreaker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,900&family=Courier+Prime:wght@400&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #0f0e0b; --cream: #f4f0e6; --cream-dark: #e8e3d6;
+    --red: #b91c1c; --ink-muted: #6b6860; --rule: #c8c2b2;
+  }
+  body {
+    background: var(--cream); color: var(--ink);
+    font-family: 'Courier Prime', monospace;
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 2rem; text-align: center;
+  }
+  .err-code {
+    font-family: 'Playfair Display', serif; font-weight: 900; font-style: italic;
+    font-size: clamp(6rem, 20vw, 12rem); line-height: 1;
+    color: var(--red); letter-spacing: -0.03em; margin-bottom: 1rem;
+  }
+  .err-rule { border: none; border-top: 2px solid var(--ink); width: 120px; margin: 0 auto 1.5rem; }
+  .err-head {
+    font-family: 'Playfair Display', serif; font-weight: 900;
+    font-size: 1.5rem; margin-bottom: 0.75rem; color: var(--ink);
+  }
+  .err-body { font-size: 0.8rem; color: var(--ink-muted); line-height: 1.7; margin-bottom: 2rem; letter-spacing: 0.05em; }
+  .err-link {
+    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--cream); background: var(--ink); text-decoration: none;
+    padding: 0.65rem 1.75rem; display: inline-block; transition: background 0.15s;
+  }
+  .err-link:hover { background: var(--red); }
+  .err-brand {
+    margin-top: 3rem; font-size: 0.65rem; color: var(--ink-muted);
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .err-brand a { color: var(--ink-muted); text-decoration: none; }
+  .err-brand a:hover { color: var(--ink); }
+</style>
+</head>
+<body>
+  <div class="err-code">404</div>
+  <hr class="err-rule"/>
+  <h1 class="err-head">Page Not Found</h1>
+  <p class="err-body">This franchise profile may not exist yet — or the URL is incorrect.<br/>Our database grows weekly. Check back soon.</p>
+  <a href="/" class="err-link">Return to Homepage →</a>
+  <div class="err-brand"><a href="/">FranchiseDealBreaker</a> &nbsp;·&nbsp; Find the red flags before you sign.</div>
+</body>
+</html>
