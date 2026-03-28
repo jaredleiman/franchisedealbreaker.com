@@ -1,1 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FranchiseDealBreaker — AI Franchise Risk Intelligence</title>
+<meta name="description" content="AI-powered franchise due diligence. We scan your FDD for the red flags that kill franchisees — before you invest your life savings. Full Red Flag Report in 24 hours."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+:root {
+  --bg-base:     #0a0c0f;
+  --bg-raised:   #0f1318;
+  --bg-card:     #131820;
+  --bg-glass:    rgba(255,255,255,0.03);
+  --bg-glass-2:  rgba(255,255,255,0.06);
+  --border:      rgba(255,255,255,0.07);
+  --border-2:    rgba(255,255,255,0.12);
+  --border-red:  rgba(220,38,38,0.35);
+  --border-amb:  rgba(217,119,6,0.35);
+  --red:         #dc2626;
+  --red-dim:     rgba(220,38,38,0.15);
+  --red-glow:    rgba(220,38,38,0.25);
+  --amber:       #d97706;
+  --amber-dim:   rgba(217,119,6,0.15);
+  --orange:      #ea580c;
+  --green:       #16a34a;
+  --green-dim:   rgba(22,163,74,0.12);
+  --text-1:      #f0f2f5;
+  --text-2:      #8b95a1;
+  --text-3:      #4a5568;
+  --text-red:    #f87171;
+  --text-amber:  #fbbf24;
+  --text-green:  #4ade80;
+  --mono:        'JetBrains Mono', monospace;
+  --sans:        'Space Grotesk', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text-1);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── NOISE + GRID TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+body::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.5;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(10,12,15,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  max-width: 1280px; margin: 0 auto;
+  padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+}
+
+.nav-logo {
+  font-family: var(--sans); font-weight: 700; font-size: 1rem;
+  color: var(--text-1); text-decoration: none; letter-spacing: -0.01em;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+
+.nav-logo .logo-icon {
+  width: 28px; height: 28px;
+  background: var(--red-dim); border: 1px solid var(--border-red);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+}
+
+.nav-logo .break { color: var(--red); }
+
+.nav-links { display: flex; align-items: center; gap: 1.75rem; list-style: none; }
+
+.nav-links a {
+  font-family: var(--mono); font-size: 0.72rem;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-2); text-decoration: none; transition: color 0.15s;
+}
+
+.nav-links a:hover { color: var(--text-1); }
+
+.nav-cta {
+  font-family: var(--mono) !important; font-size: 0.7rem !important;
+  letter-spacing: 0.08em !important; text-transform: uppercase !important;
+  background: var(--red) !important; color: var(--text-1) !important;
+  padding: 0.45rem 1.1rem; border-radius: 5px;
+  border: 1px solid rgba(220,38,38,0.5) !important;
+  transition: all 0.15s !important;
+  box-shadow: 0 0 12px rgba(220,38,38,0.2) !important;
+}
+
+.nav-cta:hover { background: #b91c1c !important; box-shadow: 0 0 20px rgba(220,38,38,0.35) !important; }
+
+/* ── HERO ── */
+.hero {
+  position: relative; z-index: 1;
+  padding: 6rem 2rem 4rem;
+  overflow: hidden;
+}
+
+.hero-glow {
+  position: absolute; top: -200px; right: -100px;
+  width: 700px; height: 700px;
+  background: radial-gradient(ellipse, rgba(220,38,38,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-glow-2 {
+  position: absolute; bottom: -100px; left: -100px;
+  width: 500px; height: 500px;
+  background: radial-gradient(ellipse, rgba(217,119,6,0.04) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-inner {
+  max-width: 1280px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 460px;
+  gap: 5rem; align-items: center;
+  position: relative; z-index: 1;
+}
+
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--red-dim); border: 1px solid var(--border-red);
+  color: var(--text-red); font-family: var(--mono);
+  font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.3rem 0.85rem; border-radius: 3px;
+  margin-bottom: 1.75rem;
+}
+
+.hero-tag .pulse {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--red);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(220,38,38,0.4); }
+  50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(220,38,38,0); }
+}
+
+.hero-headline {
+  font-weight: 700; font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1.05; letter-spacing: -0.03em;
+  color: var(--text-1); margin-bottom: 1.5rem;
+}
+
+.hero-headline .accent { color: var(--red); }
+.hero-headline .dim { color: var(--text-2); }
+
+.hero-deck {
+  font-size: 1rem; color: var(--text-2); line-height: 1.75;
+  max-width: 500px; margin-bottom: 2.5rem;
+}
+
+.hero-deck strong { color: var(--text-1); font-weight: 600; }
+
+.hero-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--red); color: var(--text-1);
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.85rem 2rem; border-radius: 5px;
+  text-decoration: none; border: 1px solid rgba(220,38,38,0.5);
+  cursor: pointer; transition: all 0.15s;
+  box-shadow: 0 0 20px rgba(220,38,38,0.25), 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.btn-primary:hover {
+  background: #b91c1c;
+  box-shadow: 0 0 30px rgba(220,38,38,0.4), 0 4px 12px rgba(0,0,0,0.3);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  color: var(--text-2); font-family: var(--mono);
+  font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.85rem 1.5rem; border-radius: 5px;
+  text-decoration: none; border: 1px solid var(--border-2);
+  transition: all 0.15s;
+}
+
+.btn-ghost:hover { color: var(--text-1); border-color: rgba(255,255,255,0.2); background: var(--bg-glass); }
+
+/* HERO STATS */
+.hero-stats {
+  display: flex; gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden;
+  background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+}
+
+.hero-stat {
+  flex: 1; padding: 1rem 1.25rem;
+  border-right: 1px solid var(--border);
+}
+
+.hero-stat:last-child { border-right: none; }
+
+.hero-stat .num {
+  font-weight: 700; font-size: 1.5rem; line-height: 1;
+  letter-spacing: -0.02em; margin-bottom: 0.25rem;
+}
+
+.hero-stat .num.danger { color: var(--text-red); }
+.hero-stat .lbl { font-family: var(--mono); font-size: 0.62rem; color: var(--text-3); letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.4; }
+
+/* ── HERO DASHBOARD CARD ── */
+.dashboard-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-2);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+  position: relative;
+}
+
+.dashboard-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(220,38,38,0.5), transparent);
+}
+
+.dc-header {
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+  padding: 0.85rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.dc-header-left { display: flex; align-items: center; gap: 0.75rem; }
+.dc-dots { display: flex; gap: 5px; }
+.dc-dots span { width: 10px; height: 10px; border-radius: 50%; }
+.dc-dot-r { background: var(--red); opacity: 0.8; }
+.dc-dot-y { background: var(--amber); opacity: 0.8; }
+.dc-dot-g { background: var(--green); opacity: 0.8; }
+.dc-title { font-family: var(--mono); font-size: 0.68rem; color: var(--text-3); letter-spacing: 0.08em; text-transform: uppercase; }
+
+.dc-status {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-family: var(--mono); font-size: 0.62rem; color: var(--text-red);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+.dc-status::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--red); animation: pulse 1.5s ease-in-out infinite; }
+
+.dc-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+
+/* RISK METER */
+.risk-meter-wrap { background: var(--bg-glass); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem; }
+.rm-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.75rem; }
+.rm-label { font-family: var(--mono); font-size: 0.62rem; color: var(--text-3); letter-spacing: 0.1em; text-transform: uppercase; }
+.rm-score { font-weight: 700; font-size: 2rem; color: var(--red); letter-spacing: -0.02em; line-height: 1; }
+.rm-score span { font-size: 0.85rem; color: var(--text-3); font-weight: 400; }
+.rm-bar-bg { height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; margin-bottom: 0.5rem; }
+.rm-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--amber), var(--red)); width: 62%; transition: width 1.5s ease; box-shadow: 0 0 8px rgba(220,38,38,0.4); }
+.rm-ticks { display: flex; justify-content: space-between; }
+.rm-tick { font-family: var(--mono); font-size: 0.55rem; color: var(--text-3); }
+
+/* ALERT ITEMS */
+.alert-list { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.alert-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.55rem 0.85rem;
+  border-radius: 5px; border: 1px solid;
+  font-size: 0.8rem; cursor: default;
+  transition: background 0.15s;
+}
+
+.alert-item:hover { filter: brightness(1.1); }
+
+.alert-item.flagged {
+  background: rgba(220,38,38,0.06);
+  border-color: rgba(220,38,38,0.2);
+}
+
+.alert-item.warning {
+  background: rgba(217,119,6,0.06);
+  border-color: rgba(217,119,6,0.2);
+}
+
+.alert-item.clear {
+  background: rgba(22,163,74,0.04);
+  border-color: rgba(22,163,74,0.15);
+}
+
+.alert-item-left { display: flex; align-items: center; gap: 0.6rem; }
+.alert-item-num { font-family: var(--mono); font-size: 0.62rem; color: var(--text-3); min-width: 48px; }
+.alert-item-name { font-size: 0.8rem; color: var(--text-2); }
+
+.alert-badge {
+  font-family: var(--mono); font-size: 0.58rem; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.15rem 0.5rem; border-radius: 3px;
+}
+
+.badge-flag { background: rgba(220,38,38,0.15); color: var(--text-red); }
+.badge-warn { background: rgba(217,119,6,0.15); color: var(--text-amber); }
+.badge-ok   { background: rgba(22,163,74,0.12); color: var(--text-green); }
+
+.dc-footer {
+  border-top: 1px solid var(--border);
+  padding: 0.85rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.dc-footer-text { font-family: var(--mono); font-size: 0.62rem; color: var(--text-3); letter-spacing: 0.06em; }
+
+.dc-cta {
+  font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-red);
+  text-decoration: none; border: 1px solid var(--border-red);
+  padding: 0.3rem 0.85rem; border-radius: 3px;
+  transition: all 0.15s;
+  background: var(--red-dim);
+}
+
+.dc-cta:hover { background: rgba(220,38,38,0.2); box-shadow: 0 0 12px rgba(220,38,38,0.2); }
+
+/* ── TICKER ── */
+.ticker {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-raised);
+  overflow: hidden; padding: 0.6rem 0;
+  display: flex; align-items: center;
+}
+
+.ticker-label {
+  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--red); background: var(--bg-raised);
+  padding: 0 1.5rem; border-right: 1px solid var(--border);
+  white-space: nowrap; flex-shrink: 0; z-index: 1;
+}
+
+.ticker-track { overflow: hidden; flex: 1; }
+.ticker-inner { display: flex; animation: ticker 40s linear infinite; white-space: nowrap; }
+
+.ticker-item {
+  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-3);
+  padding: 0 2rem; display: inline-flex; align-items: center; gap: 0.5rem;
+  border-right: 1px solid var(--border);
+}
+
+.ticker-item .ti-dot { font-size: 0.5rem; }
+.ticker-item .ti-dot.r { color: var(--red); }
+.ticker-item .ti-dot.a { color: var(--amber); }
+.ticker-item .ti-dot.g { color: var(--green); }
+
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ── SECTIONS ── */
+.section { position: relative; z-index: 1; padding: 6rem 2rem; }
+.section-inner { max-width: 1280px; margin: 0 auto; }
+
+.sec-tag {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-3);
+  margin-bottom: 1rem;
+}
+
+.sec-tag::before { content: '//'; color: var(--red); }
+
+.sec-title {
+  font-weight: 700; font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  letter-spacing: -0.025em; line-height: 1.1; color: var(--text-1);
+  margin-bottom: 1rem;
+}
+
+.sec-title .accent { color: var(--red); }
+.sec-title .dim { color: var(--text-2); font-weight: 300; }
+
+.sec-deck { font-size: 0.95rem; color: var(--text-2); max-width: 520px; line-height: 1.75; }
+
+/* DIVIDER */
+.sec-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-2), transparent);
+  margin: 0;
+}
+
+/* ── PROBLEM CARDS ── */
+.problem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 3.5rem; }
+
+.problem-card {
+  background: var(--bg-card); padding: 2rem;
+  position: relative; overflow: hidden;
+  transition: background 0.2s;
+}
+
+.problem-card:hover { background: #161d26; }
+
+.problem-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--red); opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.problem-card:hover::before { opacity: 1; }
+
+.pc-num {
+  font-weight: 700; font-size: 3rem; letter-spacing: -0.03em; line-height: 1;
+  color: var(--red); margin-bottom: 0.75rem;
+  font-feature-settings: "tnum";
+}
+
+.pc-title { font-weight: 600; font-size: 0.95rem; color: var(--text-1); margin-bottom: 0.5rem; }
+.pc-body { font-size: 0.85rem; color: var(--text-2); line-height: 1.65; }
+
+/* ── STEPS ── */
+.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3.5rem; }
+
+.step-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 2rem;
+  position: relative;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.step-card:hover { border-color: var(--border-2); background: var(--bg-glass-2); }
+
+.step-num-wrap {
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;
+}
+
+.step-num {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: var(--red-dim); border: 1px solid var(--border-red);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 0.8rem; font-weight: 500; color: var(--text-red);
+}
+
+.step-line { flex: 1; height: 1px; background: var(--border); }
+.step-card:last-child .step-line { display: none; }
+
+.step-tag { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); margin-bottom: 0.5rem; }
+.step-card h3 { font-weight: 600; font-size: 1rem; color: var(--text-1); margin-bottom: 0.5rem; }
+.step-card p { font-size: 0.85rem; color: var(--text-2); line-height: 1.65; }
+
+/* ── FLAG TABLE ── */
+.flag-table-wrap {
+  margin-top: 3.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
+}
+
+.flag-table { width: 100%; border-collapse: collapse; }
+
+.flag-table thead tr {
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border);
+}
+
+.flag-table thead th {
+  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-3); font-weight: 400;
+  padding: 0.75rem 1.25rem; text-align: left;
+}
+
+.flag-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.flag-table tbody tr:last-child { border-bottom: none; }
+.flag-table tbody tr:hover { background: var(--bg-glass); }
+
+.flag-table td { padding: 1rem 1.25rem; vertical-align: top; }
+
+.ft-item-num { font-family: var(--mono); font-size: 0.7rem; color: var(--text-3); white-space: nowrap; }
+.ft-severity { white-space: nowrap; }
+
+.severity-pill {
+  font-family: var(--mono); font-size: 0.6rem; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.2rem 0.65rem; border-radius: 3px; border: 1px solid;
+  display: inline-block;
+}
+
+.pill-r { color: var(--text-red); border-color: rgba(220,38,38,0.3); background: rgba(220,38,38,0.08); }
+.pill-a { color: var(--text-amber); border-color: rgba(217,119,6,0.3); background: rgba(217,119,6,0.08); }
+.pill-g { color: var(--text-green); border-color: rgba(22,163,74,0.25); background: rgba(22,163,74,0.06); }
+
+.ft-title { font-weight: 600; font-size: 0.9rem; color: var(--text-1); margin-bottom: 0.3rem; display: block; }
+.ft-desc { font-size: 0.82rem; color: var(--text-2); line-height: 1.6; }
+
+/* ── SAMPLE REPORT ── */
+.report-grid { display: grid; grid-template-columns: 1fr 420px; gap: 4rem; align-items: center; margin-top: 3.5rem; }
+
+.report-ui {
+  background: var(--bg-card);
+  border: 1px solid var(--border-2);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 32px 64px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+.report-ui::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(220,38,38,0.6), transparent);
+}
+
+.rui-header {
+  background: var(--bg-raised); border-bottom: 1px solid var(--border);
+  padding: 0.85rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.rui-header-left { display: flex; align-items: center; gap: 0.6rem; }
+.rui-brand { font-family: var(--mono); font-size: 0.7rem; color: var(--text-2); }
+.rui-brand span { color: var(--red); }
+
+.rui-body { padding: 1.25rem; display: grid; grid-template-columns: 180px 1fr; gap: 1rem; }
+
+.rui-score-panel {
+  background: var(--bg-glass); border: 1px solid var(--border);
+  border-radius: 8px; padding: 1.25rem;
+  display: flex; flex-direction: column; gap: 0.75rem;
+}
+
+.rui-score-lbl { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); }
+.rui-score-big { font-weight: 700; font-size: 3.5rem; color: var(--red); line-height: 1; letter-spacing: -0.03em; }
+.rui-score-big span { font-size: 1rem; color: var(--text-3); font-weight: 400; }
+
+.rui-gauge { margin: 0.25rem 0; }
+.rui-gauge-bg { height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; }
+.rui-gauge-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--amber), var(--red)); width: 62%; box-shadow: 0 0 6px rgba(220,38,38,0.5); }
+
+.rui-verdict { font-size: 0.72rem; color: var(--text-2); line-height: 1.55; padding-top: 0.6rem; border-top: 1px solid var(--border); }
+
+.rui-items { display: flex; flex-direction: column; gap: 0.35rem; }
+
+.rui-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.45rem 0.75rem; border-radius: 5px; border: 1px solid;
+  font-size: 0.77rem; transition: all 0.15s;
+}
+
+.rui-item:hover { filter: brightness(1.15); }
+.rui-item.r { background: rgba(220,38,38,0.06); border-color: rgba(220,38,38,0.2); color: var(--text-2); }
+.rui-item.a { background: rgba(217,119,6,0.06); border-color: rgba(217,119,6,0.2); color: var(--text-2); }
+.rui-item.g { background: rgba(22,163,74,0.04); border-color: rgba(22,163,74,0.15); color: var(--text-2); }
+
+.rui-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.rd-r { background: var(--red); box-shadow: 0 0 4px rgba(220,38,38,0.6); }
+.rd-a { background: var(--amber); box-shadow: 0 0 4px rgba(217,119,6,0.6); }
+.rd-g { background: var(--green); box-shadow: 0 0 4px rgba(22,163,74,0.6); }
+
+.rui-blur {
+  position: relative;
+}
+
+.rui-blur::after {
+  content: '— UNLOCK FULL REPORT —';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 100px;
+  background: linear-gradient(to bottom, transparent, var(--bg-card) 75%);
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 0.85rem;
+  font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.15em;
+  color: var(--text-3);
+}
+
+/* REPORT COPY */
+.report-copy h3 {
+  font-weight: 700; font-size: 1.75rem; color: var(--text-1);
+  letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 1rem;
+}
+
+.report-copy p { font-size: 0.9rem; color: var(--text-2); line-height: 1.75; margin-bottom: 1.25rem; }
+
+.report-features { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 2rem; }
+
+.report-features li {
+  display: flex; align-items: center; gap: 0.65rem;
+  font-size: 0.875rem; color: var(--text-2);
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-glass); border: 1px solid var(--border);
+  border-radius: 5px;
+}
+
+.report-features li::before {
+  content: '✓'; font-size: 0.75rem; font-weight: 700;
+  color: var(--text-green); flex-shrink: 0;
+}
+
+/* ── DATABASE ── */
+.db-wrap {
+  margin-top: 3.5rem;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
+}
+
+.db-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
+  background: var(--bg-raised);
+}
+
+.db-header-left { display: flex; align-items: center; gap: 0.75rem; }
+.db-header-title { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-2); }
+.db-count { font-family: var(--mono); font-size: 0.62rem; color: var(--text-3); }
+.db-view-all { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-red); text-decoration: none; border: 1px solid var(--border-red); padding: 0.25rem 0.75rem; border-radius: 3px; transition: all 0.15s; }
+.db-view-all:hover { background: var(--red-dim); }
+
+.db-table { width: 100%; border-collapse: collapse; }
+.db-table thead tr { border-bottom: 1px solid var(--border); }
+.db-table thead th { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); font-weight: 400; padding: 0.65rem 1.25rem; text-align: left; }
+.db-table tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+.db-table tbody tr:last-child { border-bottom: none; }
+.db-table tbody tr:hover { background: var(--bg-glass); }
+.db-table td { padding: 0.85rem 1.25rem; font-size: 0.85rem; color: var(--text-2); }
+.db-name { font-weight: 600; color: var(--text-1); font-size: 0.9rem; }
+.db-cat { font-family: var(--mono); font-size: 0.65rem; color: var(--text-3); margin-top: 0.1rem; }
+.db-inv { font-family: var(--mono); font-size: 0.75rem; color: var(--text-2); }
+.db-link { font-family: var(--mono); font-size: 0.65rem; color: var(--text-red); text-decoration: none; letter-spacing: 0.06em; }
+.db-link:hover { color: var(--red); }
+
+/* ── PRICING ── */
+.pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 3.5rem; max-width: 820px; }
+
+.price-card {
+  background: var(--bg-card); border: 1px solid var(--border-2);
+  border-radius: 10px; padding: 2.25rem;
+  display: flex; flex-direction: column; gap: 1.25rem;
+  position: relative; transition: border-color 0.2s;
+}
+
+.price-card:hover { border-color: rgba(255,255,255,0.18); }
+
+.price-card.featured {
+  border-color: var(--border-red);
+  background: linear-gradient(135deg, var(--bg-card), rgba(220,38,38,0.04));
+  box-shadow: 0 0 40px rgba(220,38,38,0.08);
+}
+
+.featured-tag {
+  position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+  background: var(--red); color: var(--text-1);
+  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.25rem 1rem; border-radius: 0 0 5px 5px;
+}
+
+.price-tier { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+.price-amount { font-weight: 700; font-size: 3.5rem; color: var(--text-1); letter-spacing: -0.03em; line-height: 1; }
+.price-amount sup { font-size: 1.25rem; font-weight: 400; color: var(--text-2); vertical-align: super; }
+.price-desc { font-size: 0.85rem; color: var(--text-2); line-height: 1.65; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+
+.price-features { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+.price-features li { font-size: 0.85rem; color: var(--text-2); display: flex; gap: 0.65rem; align-items: flex-start; }
+.price-features li::before { content: '→'; font-family: var(--mono); color: var(--text-red); flex-shrink: 0; font-size: 0.75rem; margin-top: 0.1em; }
+
+.btn-buy {
+  display: block; width: 100%; text-align: center;
+  background: var(--red); color: var(--text-1);
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.85rem; border-radius: 5px;
+  text-decoration: none; border: 1px solid rgba(220,38,38,0.5);
+  cursor: pointer; transition: all 0.15s; margin-top: auto;
+  box-shadow: 0 0 20px rgba(220,38,38,0.2);
+}
+
+.btn-buy:hover { background: #b91c1c; box-shadow: 0 0 28px rgba(220,38,38,0.35); }
+
+.btn-buy-ghost {
+  display: block; width: 100%; text-align: center;
+  background: transparent; color: var(--text-2);
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.85rem; border-radius: 5px;
+  text-decoration: none; border: 1px solid var(--border-2);
+  cursor: pointer; transition: all 0.15s; margin-top: auto;
+}
+
+.btn-buy-ghost:hover { border-color: rgba(255,255,255,0.2); color: var(--text-1); background: var(--bg-glass); }
+
+.disclaimer {
+  background: var(--bg-glass); border: 1px solid var(--border);
+  border-radius: 6px; padding: 1rem 1.25rem;
+  font-family: var(--mono); font-size: 0.65rem; color: var(--text-3);
+  line-height: 1.7; margin-top: 1.5rem; max-width: 820px;
+  letter-spacing: 0.02em;
+}
+
+.disclaimer strong { color: var(--text-2); font-weight: 500; }
+
+/* ── FAQ ── */
+.faq-list { margin-top: 3rem; max-width: 760px; display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-item:last-child { border-bottom: none; }
+.faq-q {
+  width: 100%; text-align: left; background: var(--bg-card); border: none;
+  padding: 1.25rem 1.5rem; color: var(--text-1);
+  font-family: var(--sans); font-weight: 600; font-size: 0.9rem;
+  cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+  gap: 1rem; transition: background 0.1s;
+}
+.faq-q:hover { background: var(--bg-glass-2); }
+.faq-icon { font-family: var(--mono); font-size: 1rem; color: var(--text-3); font-style: normal; transition: transform 0.2s, color 0.15s; }
+.faq-q[aria-expanded="true"] .faq-icon { transform: rotate(45deg); color: var(--red); }
+.faq-a { display: none; padding: 0 1.5rem 1.25rem; font-size: 0.875rem; color: var(--text-2); line-height: 1.75; background: var(--bg-card); }
+.faq-a.open { display: block; }
+
+/* ── CTA ── */
+.cta-section {
+  position: relative; z-index: 1; padding: 7rem 2rem;
+  overflow: hidden;
+  background: var(--bg-raised);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.cta-section::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(220,38,38,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.cta-inner { max-width: 640px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
+
+.cta-tag {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 1.5rem;
+}
+
+.cta-tag::before, .cta-tag::after { content: '—'; color: var(--border-2); }
+
+.cta-title {
+  font-weight: 700; font-size: clamp(2.25rem, 5vw, 3.5rem);
+  color: var(--text-1); letter-spacing: -0.03em;
+  line-height: 1.05; margin-bottom: 1rem;
+}
+
+.cta-title .accent { color: var(--red); }
+
+.cta-deck { font-size: 0.95rem; color: var(--text-2); line-height: 1.75; margin-bottom: 2.5rem; }
+
+.cta-actions { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+
+/* ── FOOTER ── */
+footer {
+  position: relative; z-index: 1;
+  background: var(--bg-base);
+  border-top: 1px solid var(--border);
+  padding: 3rem 2rem 2rem;
+}
+
+.footer-inner { max-width: 1280px; margin: 0 auto; }
+
+.footer-top {
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 3rem; padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border); margin-bottom: 2rem;
+}
+
+.footer-brand .logo-text { font-weight: 700; font-size: 1rem; color: var(--text-1); letter-spacing: -0.01em; }
+.footer-brand .logo-text .break { color: var(--red); }
+.footer-brand p { font-size: 0.82rem; color: var(--text-3); line-height: 1.65; margin-top: 0.75rem; max-width: 260px; }
+
+.footer-col h4 { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-bottom: 1rem; }
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+.footer-col a { font-size: 0.85rem; color: var(--text-2); text-decoration: none; transition: color 0.15s; }
+.footer-col a:hover { color: var(--text-1); }
+
+.footer-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+.footer-legal { font-family: var(--mono); font-size: 0.62rem; color: var(--text-3); line-height: 1.6; max-width: 580px; letter-spacing: 0.02em; }
+.footer-copy { font-family: var(--mono); font-size: 0.62rem; color: var(--text-3); }
+
+/* ── SCROLL REVEAL ── */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .dashboard-card { max-width: 500px; }
+  .report-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .section { padding: 4rem 1.25rem; }
+  .hero { padding: 4rem 1.25rem 3rem; }
+  .problem-grid { grid-template-columns: 1fr; gap: 1px; }
+  .steps-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; }
+  .hero-stats { flex-direction: column; gap: 0; }
+  .hero-stat { border-right: none; border-bottom: 1px solid var(--border); }
+  .hero-stat:last-child { border-bottom: none; }
+  .rui-body { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="logo-icon">⚑</div>
+      Franchise<span class="break">Deal</span>Breaker
+    </a>
+    <ul class="nav-links">
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#red-flags">Red Flags</a></li>
+      <li><a href="#database">Database</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#pricing" class="nav-cta">Get Report →</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-tag"><span class="pulse"></span>AI Franchise Risk Intelligence</div>
+      <h1 class="hero-headline">
+        Find the <span class="accent">red flags</span><br/>
+        <span class="dim">before you sign.</span>
+      </h1>
+      <p class="hero-deck">
+        You just received a 400-page FDD and <strong>14 days to decide</strong> whether to invest your life savings. Our forensic AI engine scans all 23 required Items and delivers a plain-English risk verdict in 24 hours.
+      </p>
+      <div class="hero-actions">
+        <a href="#pricing" class="btn-primary">Run Risk Analysis →</a>
+        <a href="#database" class="btn-ghost">Browse Free Database</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="num danger">$3,000+</div>
+          <div class="lbl">Franchise attorney<br/>review cost</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num danger">14 days</div>
+          <div class="lbl">FTC-mandated<br/>review window</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">400 pgs</div>
+          <div class="lbl">Average FDD<br/>document length</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">24 hrs</div>
+          <div class="lbl">Our report<br/>delivery time</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD CARD -->
+    <div class="dashboard-card">
+      <div class="dc-header">
+        <div class="dc-header-left">
+          <div class="dc-dots">
+            <span class="dc-dot-r"></span>
+            <span class="dc-dot-y"></span>
+            <span class="dc-dot-g"></span>
+          </div>
+          <div class="dc-title">risk_analysis.fdd — sample output</div>
+        </div>
+        <div class="dc-status">3 flags detected</div>
+      </div>
+      <div class="dc-body">
+        <div class="risk-meter-wrap">
+          <div class="rm-top">
+            <div class="rm-label">Overall Risk Score</div>
+            <div class="rm-score">6.2<span>/10</span></div>
+          </div>
+          <div class="rm-bar-bg"><div class="rm-bar-fill"></div></div>
+          <div class="rm-ticks">
+            <span class="rm-tick">0 — Low</span>
+            <span class="rm-tick">5 — Medium</span>
+            <span class="rm-tick">10 — Critical</span>
+          </div>
+        </div>
+        <div class="alert-list">
+          <div class="alert-item flagged">
+            <div class="alert-item-left">
+              <span class="alert-item-num">Item 03</span>
+              <span class="alert-item-name">Litigation History</span>
+            </div>
+            <span class="alert-badge badge-flag">⚑ Flagged</span>
+          </div>
+          <div class="alert-item flagged">
+            <div class="alert-item-left">
+              <span class="alert-item-num">Item 19</span>
+              <span class="alert-item-name">Earnings Claims</span>
+            </div>
+            <span class="alert-badge badge-flag">⚑ Flagged</span>
+          </div>
+          <div class="alert-item flagged">
+            <div class="alert-item-left">
+              <span class="alert-item-num">Item 12</span>
+              <span class="alert-item-name">Territory Rights</span>
+            </div>
+            <span class="alert-badge badge-flag">⚑ Flagged</span>
+          </div>
+          <div class="alert-item warning">
+            <div class="alert-item-left">
+              <span class="alert-item-num">Item 20</span>
+              <span class="alert-item-name">Franchisee Turnover</span>
+            </div>
+            <span class="alert-badge badge-warn">⚠ Warning</span>
+          </div>
+          <div class="alert-item warning">
+            <div class="alert-item-left">
+              <span class="alert-item-num">Item 21</span>
+              <span class="alert-item-name">Financial Statements</span>
+            </div>
+            <span class="alert-badge badge-warn">⚠ Warning</span>
+          </div>
+          <div class="alert-item clear">
+            <div class="alert-item-left">
+              <span class="alert-item-num">Item 17</span>
+              <span class="alert-item-name">Renewal Terms</span>
+            </div>
+            <span class="alert-badge badge-ok">✓ Clear</span>
+          </div>
+        </div>
+      </div>
+      <div class="dc-footer">
+        <div class="dc-footer-text">// sample output — full report unlocked after purchase</div>
+        <a href="https://buy.stripe.com/eVq9AT1yZatRgL074feIw09" class="dc-cta">Unlock →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-label">Scanning ▸</div>
+  <div class="ticker-track">
+    <div class="ticker-inner">
+      <span class="ticker-item"><span class="ti-dot r">●</span>Item 03 — Litigation History</span>
+      <span class="ticker-item"><span class="ti-dot r">●</span>Item 19 — Earnings Claims</span>
+      <span class="ticker-item"><span class="ti-dot r">●</span>Item 12 — Territory Rights</span>
+      <span class="ticker-item"><span class="ti-dot a">●</span>Item 20 — Franchisee Turnover</span>
+      <span class="ticker-item"><span class="ti-dot a">●</span>Item 21 — Financial Statements</span>
+      <span class="ticker-item"><span class="ti-dot a">●</span>Item 17 — Renewal &amp; Exit Terms</span>
+      <span class="ticker-item"><span class="ti-dot g">●</span>Item 04 — Bankruptcy History</span>
+      <span class="ticker-item"><span class="ti-dot g">●</span>Item 07 — Estimated Initial Investment</span>
+      <span class="ticker-item"><span class="ti-dot r">●</span>Item 09 — Franchisee Obligations</span>
+      <span class="ticker-item"><span class="ti-dot a">●</span>Item 06 — Fees &amp; Royalty Structure</span>
+      <span class="ticker-item"><span class="ti-dot r">●</span>Item 03 — Litigation History</span>
+      <span class="ticker-item"><span class="ti-dot r">●</span>Item 19 — Earnings Claims</span>
+      <span class="ticker-item"><span class="ti-dot r">●</span>Item 12 — Territory Rights</span>
+      <span class="ticker-item"><span class="ti-dot a">●</span>Item 20 — Franchisee Turnover</span>
+      <span class="ticker-item"><span class="ti-dot a">●</span>Item 21 — Financial Statements</span>
+      <span class="ticker-item"><span class="ti-dot a">●</span>Item 17 — Renewal &amp; Exit Terms</span>
+      <span class="ticker-item"><span class="ti-dot g">●</span>Item 04 — Bankruptcy History</span>
+      <span class="ticker-item"><span class="ti-dot g">●</span>Item 07 — Estimated Initial Investment</span>
+      <span class="ticker-item"><span class="ti-dot r">●</span>Item 09 — Franchisee Obligations</span>
+      <span class="ticker-item"><span class="ti-dot a">●</span>Item 06 — Fees &amp; Royalty Structure</span>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="section reveal">
+  <div class="section-inner">
+    <div class="sec-tag">The Problem</div>
+    <h2 class="sec-title">The deck is stacked <span class="dim">against you.</span></h2>
+    <p class="sec-deck">Franchise brokers earn $20,000–$50,000 when you sign. Nobody in that transaction is paid to tell you no. We are.</p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="pc-num">42%</div>
+        <div class="pc-title">Of franchisees didn't fully understand what they signed</div>
+        <p class="pc-body">The franchisor's sales team is polished and on commission. Their job is to get you to sign. Your job is to know the risks first.</p>
+      </div>
+      <div class="problem-card">
+        <div class="pc-num">20%</div>
+        <div class="pc-title">Of new franchises fail within the first year</div>
+        <p class="pc-body">Most failures trace back to red flags buried in the FDD — in Item 20 turnover tables or hidden in Item 19 earnings omissions.</p>
+      </div>
+      <div class="problem-card">
+        <div class="pc-num">$150K+</div>
+        <div class="pc-title">Average total franchise investment at stake</div>
+        <p class="pc-body">You wouldn't buy a house without an inspection. This is your forensic inspection — in 24 hours, for less than 0.3% of your commitment.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sec-divider"></div>
+
+<!-- HOW IT WORKS -->
+<section class="section reveal" id="how-it-works">
+  <div class="section-inner">
+    <div class="sec-tag">How It Works</div>
+    <h2 class="sec-title">Three steps to <span class="accent">clarity.</span></h2>
+    <p class="sec-deck">Submit your FDD, our forensic AI scans it, you get a plain-English risk verdict with the exact questions to ask before you sign.</p>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num-wrap">
+          <div class="step-num">01</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-tag">// submit</div>
+        <h3>Upload your FDD</h3>
+        <p>Securely submit your Franchise Disclosure Document through our encrypted intake form. Any format — digital PDF or scanned copy.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num-wrap">
+          <div class="step-num">02</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-tag">// analyze</div>
+        <h3>Forensic AI analysis</h3>
+        <p>Our engine processes all 23 FDD Items, cross-referencing known failure patterns, litigation flags, and franchisee attrition data.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num-wrap">
+          <div class="step-num">03</div>
+        </div>
+        <div class="step-tag">// deliver</div>
+        <h3>Risk Report delivered</h3>
+        <p>Within 24 hours you receive a plain-English PDF with your risk score, flagged Items, and the 10 questions to ask your franchisor.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sec-divider"></div>
+
+<!-- RED FLAGS -->
+<section class="section reveal" id="red-flags">
+  <div class="section-inner">
+    <div class="sec-tag">Risk Analysis</div>
+    <h2 class="sec-title">What gets <span class="accent">flagged.</span></h2>
+    <p class="sec-deck">All 23 required FDD Items are analyzed. These carry the highest weight in our risk scoring model.</p>
+    <div class="flag-table-wrap">
+      <table class="flag-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Severity</th>
+            <th>What We Detect</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ft-item-num">Item 03</td>
+            <td class="ft-severity"><span class="severity-pill pill-r">Critical</span></td>
+            <td><span class="ft-title">Litigation History</span><span class="ft-desc">Patterns of franchisee-initiated suits, regulatory actions, and undisclosed settlements. A single suit is noise — a pattern is a signal.</span></td>
+          </tr>
+          <tr>
+            <td class="ft-item-num">Item 19</td>
+            <td class="ft-severity"><span class="severity-pill pill-r">Critical</span></td>
+            <td><span class="ft-title">Financial Performance Representations</span><span class="ft-desc">What the franchisor discloses about earnings — and what they omit. Most FDDs show only top-quartile earners. We surface what the data actually says.</span></td>
+          </tr>
+          <tr>
+            <td class="ft-item-num">Item 12</td>
+            <td class="ft-severity"><span class="severity-pill pill-r">Critical</span></td>
+            <td><span class="ft-title">Territory &amp; Exclusivity</span><span class="ft-desc">Encroachment clauses, territory carve-outs, and company-store exceptions. The most commonly misunderstood risk in franchising.</span></td>
+          </tr>
+          <tr>
+            <td class="ft-item-num">Item 20</td>
+            <td class="ft-severity"><span class="severity-pill pill-a">High Risk</span></td>
+            <td><span class="ft-title">Outlet Transfers &amp; Turnover</span><span class="ft-desc">How many franchisees exited last year — and whether they chose to leave or were terminated. This table tells the real story.</span></td>
+          </tr>
+          <tr>
+            <td class="ft-item-num">Item 21</td>
+            <td class="ft-severity"><span class="severity-pill pill-a">High Risk</span></td>
+            <td><span class="ft-title">Franchisor Financial Statements</span><span class="ft-desc">Is this a growing system or a franchisor kept alive by new franchise fees with declining royalty income? The audited statements answer this.</span></td>
+          </tr>
+          <tr>
+            <td class="ft-item-num">Item 17</td>
+            <td class="ft-severity"><span class="severity-pill pill-a">High Risk</span></td>
+            <td><span class="ft-title">Renewal, Termination &amp; Transfer</span><span class="ft-desc">On what grounds can the franchisor terminate you and take your built business? Most buyers never read this item. We read it for you.</span></td>
+          </tr>
+          <tr>
+            <td class="ft-item-num">Items 01–23</td>
+            <td class="ft-severity"><span class="severity-pill pill-g">Full Scan</span></td>
+            <td><span class="ft-title">All 23 Remaining Items</span><span class="ft-desc">Bankruptcy history, fee structures, supplier restrictions, training obligations, IP rights, and 15 additional disclosure Items — all scored and flagged.</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="sec-divider"></div>
+
+<!-- REPORT PREVIEW -->
+<section class="section reveal">
+  <div class="section-inner">
+    <div class="sec-tag">Sample Output</div>
+    <h2 class="sec-title">What you <span class="accent">receive.</span></h2>
+    <div class="report-grid">
+      <div class="rui-blur">
+        <div class="report-ui">
+          <div class="rui-header">
+            <div class="rui-header-left">
+              <div class="dc-dots">
+                <span class="dc-dot-r"></span>
+                <span class="dc-dot-y"></span>
+                <span class="dc-dot-g"></span>
+              </div>
+              <div class="rui-brand">Franchise<span>Deal</span>Breaker — <span style="color:var(--text-3)">Red Flag Report</span></div>
+            </div>
+            <span class="severity-pill pill-r">High Risk</span>
+          </div>
+          <div class="rui-body">
+            <div class="rui-score-panel">
+              <div class="rui-score-lbl">Risk Score</div>
+              <div class="rui-score-big">6.2<span>/10</span></div>
+              <div class="rui-gauge"><div class="rui-gauge-bg"><div class="rui-gauge-fill"></div></div></div>
+              <div class="rui-verdict">Pattern of franchisee litigation, Item 19 discloses top-quartile only, territory clause permits encroachment within 5 miles.</div>
+            </div>
+            <div class="rui-items">
+              <div class="rui-item r"><span>Item 03 — Litigation</span><span class="rui-dot rd-r"></span></div>
+              <div class="rui-item g"><span>Item 04 — Bankruptcy</span><span class="rui-dot rd-g"></span></div>
+              <div class="rui-item r"><span>Item 12 — Territory</span><span class="rui-dot rd-r"></span></div>
+              <div class="rui-item r"><span>Item 19 — Earnings Claims</span><span class="rui-dot rd-r"></span></div>
+              <div class="rui-item a"><span>Item 20 — Turnover</span><span class="rui-dot rd-a"></span></div>
+              <div class="rui-item a"><span>Item 21 — Financials</span><span class="rui-dot rd-a"></span></div>
+              <div class="rui-item g"><span>Item 17 — Renewal Terms</span><span class="rui-dot rd-g"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="report-copy">
+        <h3>Everything in plain English. In 24 hours.</h3>
+        <p>Your Full Red Flag Report covers all 23 FDD Items with a risk score, per-item findings, and the exact questions to ask your franchisor before signing anything.</p>
+        <ul class="report-features">
+          <li>All 23 Items analyzed and scored</li>
+          <li>Red/Amber/Green rating per item</li>
+          <li>Plain-English explanation of every flag</li>
+          <li>10 questions to ask before signing</li>
+          <li>One-page executive summary</li>
+          <li>Full PDF in your inbox within 24 hours</li>
+        </ul>
+        <a href="https://buy.stripe.com/eVq9AT1yZatRgL074feIw09" class="btn-primary">Get My Report — $497 →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sec-divider"></div>
+
+<!-- DATABASE -->
+<section class="section reveal" id="database">
+  <div class="section-inner">
+    <div class="sec-tag">Free Intelligence Database</div>
+    <h2 class="sec-title">500+ franchise <span class="accent">profiles.</span></h2>
+    <p class="sec-deck">Every profile includes a free risk overview, Item 19 summary, and litigation history. No account required.</p>
+    <div class="db-wrap">
+      <div class="db-header">
+        <div class="db-header-left">
+          <div class="db-header-title">// franchise_database</div>
+          <div class="db-count">showing 8 of 500+ records</div>
+        </div>
+        <a href="database.html" class="db-view-all">View All →</a>
+      </div>
+      <table class="db-table">
+        <thead>
+          <tr>
+            <th>Franchise</th>
+            <th>Investment Range</th>
+            <th>Category</th>
+            <th>Risk</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="db-name">Subway</div><div class="db-cat">Food &amp; Beverage</div></td>
+            <td class="db-inv">$116K – $263K</td>
+            <td><span style="font-family:var(--mono);font-size:0.72rem;color:var(--text-3)">Food &amp; Bev</span></td>
+            <td><span class="severity-pill pill-r">High</span></td>
+            <td><a href="franchises/subway.html" class="db-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="db-name">9Round</div><div class="db-cat">Fitness</div></td>
+            <td class="db-inv">$83K – $128K</td>
+            <td><span style="font-family:var(--mono);font-size:0.72rem;color:var(--text-3)">Fitness</span></td>
+            <td><span class="severity-pill pill-r">High</span></td>
+            <td><a href="#" class="db-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="db-name">Orangetheory Fitness</div><div class="db-cat">Fitness</div></td>
+            <td class="db-inv">$563K – $999K</td>
+            <td><span style="font-family:var(--mono);font-size:0.72rem;color:var(--text-3)">Fitness</span></td>
+            <td><span class="severity-pill pill-a">Medium</span></td>
+            <td><a href="#" class="db-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="db-name">Jamba Juice</div><div class="db-cat">Food &amp; Beverage</div></td>
+            <td class="db-inv">$238K – $485K</td>
+            <td><span style="font-family:var(--mono);font-size:0.72rem;color:var(--text-3)">Food &amp; Bev</span></td>
+            <td><span class="severity-pill pill-a">Medium</span></td>
+            <td><a href="#" class="db-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="db-name">Smoothie King</div><div class="db-cat">Food &amp; Beverage</div></td>
+            <td class="db-inv">$263K – $843K</td>
+            <td><span style="font-family:var(--mono);font-size:0.72rem;color:var(--text-3)">Food &amp; Bev</span></td>
+            <td><span class="severity-pill pill-a">Medium</span></td>
+            <td><a href="#" class="db-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="db-name">Anytime Fitness</div><div class="db-cat">Fitness</div></td>
+            <td class="db-inv">$78K – $521K</td>
+            <td><span style="font-family:var(--mono);font-size:0.72rem;color:var(--text-3)">Fitness</span></td>
+            <td><span class="severity-pill pill-g">Low</span></td>
+            <td><a href="#" class="db-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="db-name">Sport Clips</div><div class="db-cat">Personal Services</div></td>
+            <td class="db-inv">$203K – $375K</td>
+            <td><span style="font-family:var(--mono);font-size:0.72rem;color:var(--text-3)">Services</span></td>
+            <td><span class="severity-pill pill-g">Low</span></td>
+            <td><a href="#" class="db-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="db-name">The UPS Store</div><div class="db-cat">Business Services</div></td>
+            <td class="db-inv">$138K – $470K</td>
+            <td><span style="font-family:var(--mono);font-size:0.72rem;color:var(--text-3)">Services</span></td>
+            <td><span class="severity-pill pill-g">Low</span></td>
+            <td><a href="#" class="db-link">View →</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="sec-divider"></div>
+
+<!-- PRICING -->
+<section class="section reveal" id="pricing">
+  <div class="section-inner">
+    <div class="sec-tag">Pricing</div>
+    <h2 class="sec-title">Less than 0.3% of <span class="dim">your investment.</span></h2>
+    <p class="sec-deck">Choose your analysis depth. Both reports are encrypted, confidential, and delivered within the promised window.</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-tier">// quick_scan</div>
+        <div class="price-amount"><sup>$</sup>97</div>
+        <p class="price-desc">Top-line scan of the 5 critical items. Ideal gut-check before committing to a full analysis.</p>
+        <ul class="price-features">
+          <li>Items 3, 12, 19, 20, 21 analyzed</li>
+          <li>Risk score with plain-English verdict</li>
+          <li>Delivered within 12 hours</li>
+          <li>Encrypted PDF report</li>
+        </ul>
+        <a href="https://buy.stripe.com/6oUcN5gtTfOb7aq60beIw08" class="btn-buy-ghost">Order Quick Scan →</a>
+      </div>
+      <div class="price-card featured">
+        <div class="featured-tag">Most Popular</div>
+        <div class="price-tier">// full_red_flag_report</div>
+        <div class="price-amount"><sup>$</sup>497</div>
+        <p class="price-desc">Complete forensic analysis of all 23 FDD Items. Full risk scorecard, flagged clauses in plain English, and 10 questions to ask before signing.</p>
+        <ul class="price-features">
+          <li>All 23 Items analyzed and scored</li>
+          <li>Full risk scorecard, per-item findings</li>
+          <li>Flagged clauses with plain-English explanation</li>
+          <li>10 questions to ask your franchisor</li>
+          <li>Delivered within 24 hours</li>
+          <li>Encrypted PDF + executive summary</li>
+        </ul>
+        <a href="https://buy.stripe.com/eVq9AT1yZatRgL074feIw09" class="btn-buy">Run Full Analysis →</a>
+      </div>
+    </div>
+    <div class="disclaimer">
+      <strong>// not_legal_advice</strong> — FranchiseDealBreaker provides AI-powered document analysis for informational purposes only. Reports are not a substitute for advice from a qualified franchise attorney. We strongly recommend consulting licensed legal counsel before signing any franchise agreement or making any investment decision.
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section reveal">
+  <div class="section-inner">
+    <div class="sec-tag">FAQ</div>
+    <h2 class="sec-title">Common <span class="dim">questions.</span></h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">Is this legal advice?<em class="faq-icon">+</em></button>
+        <div class="faq-a">No. FranchiseDealBreaker provides AI-powered document analysis — the same function as a financial data provider summarizing a 10-K. We help you understand what's in your FDD. For legal advice, consult a licensed franchise attorney.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">How is this different from asking an AI chatbot?<em class="faq-icon">+</em></button>
+        <div class="faq-a">Our engine is purpose-built for FDDs — calibrated on all 23 required Items and weighted against known franchisee failure patterns. A general AI will summarize. We flag, score, and tell you exactly which questions to ask before you sign.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">How is my FDD kept confidential?<em class="faq-icon">+</em></button>
+        <div class="faq-a">Your FDD is processed over encrypted connections and never retained beyond the analysis window. We do not share, sell, or publish your document. Each submission is deleted after your report is delivered.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">What if the franchise isn't in your free database?<em class="faq-icon">+</em></button>
+        <div class="faq-a">The Full Red Flag Report works on any FDD — including franchises not in our database. You upload your specific document and we analyze it from scratch. The free database is a separate resource built from publicly available FDDs.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">Can I get a report for a resale or renewal?<em class="faq-icon">+</em></button>
+        <div class="faq-a">Yes. Resale buyers receive a current FDD with the same 14-day review window. Renewal situations often involve materially updated agreements — our analysis applies equally and may be more critical in these cases.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-inner">
+    <div class="cta-tag">Final Notice</div>
+    <h2 class="cta-title">Don't sign <span class="accent">blind.</span></h2>
+    <p class="cta-deck">You have 14 days and one chance to get this right. Run the forensic analysis before you commit your life savings.</p>
+    <div class="cta-actions">
+      <a href="https://buy.stripe.com/eVq9AT1yZatRgL074feIw09" class="btn-primary">Run Full Analysis — $497 →</a>
+      <a href="#database" class="btn-ghost">Browse Free Database</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo-text">Franchise<span class="break">Deal</span>Breaker</div>
+        <p>AI-powered franchise risk intelligence. Find the red flags before you sign. Forensic FDD analysis delivered in 24 hours.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#red-flags">What We Analyze</a></li>
+          <li><a href="#database">Free Database</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="mailto:hello@franchisedealbreaker.com">Contact</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-legal">// not a law firm — reports are for informational purposes only — always consult a licensed franchise attorney before signing any agreement</div>
+      <div class="footer-copy">© 2026 FranchiseDealBreaker</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.07 });
+reveals.forEach(r => obs.observe(r));
+
+// FAQ
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    document.querySelectorAll('.faq-q').forEach(b => {
+      b.setAttribute('aria-expanded', 'false');
+      b.nextElementSibling.classList.remove('open');
+    });
+    if (!open) {
+      btn.setAttribute('aria-expanded', 'true');
+      btn.nextElementSibling.classList.add('open');
+    }
+  });
+});
+
+// Animate risk bar on load
+setTimeout(() => {
+  const fill = document.querySelector('.rm-bar-fill');
+  if (fill) fill.style.width = '62%';
+}, 400);
+</script>
+</body>
+</html>
